@@ -1,23 +1,19 @@
-import { useRef, type FormEvent } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { Form, Col, Row, Stack, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import CreateableReactSelect from "react-select/creatable"
+import type { Tag } from "./App"
 
-// Define the type BEFORE you use it
-type NoteData = {
-  title: string
-  markdown: string
-  tags: { label: string; value: string }[]
-}
 
-// FIXED: Add => void
+
 type NoteFormProps = {
   onSubmit: (data: NoteData) => void
 }
 
-export default function NewNote({ onSubmit }: NoteFormProps) {
+export  function NoteForm({ onSubmit }: NoteFormProps) {
   const titleRef = useRef<HTMLInputElement>(null)
   const markdownRef = useRef<HTMLTextAreaElement>(null)
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -27,6 +23,7 @@ export default function NewNote({ onSubmit }: NoteFormProps) {
       markdown: markdownRef.current!.value,
       tags: []
     })
+
   }
 
   return (
@@ -43,14 +40,19 @@ export default function NewNote({ onSubmit }: NoteFormProps) {
           <Col>
             <Form.Group controlId="tags">
               <Form.Label>Tags</Form.Label>
-              <CreateableReactSelect isMulti />
+              <CreateableReactSelect value={selectedTags.map(tag => ({ label: tag.label, value: tag.id }))} 
+            onChange={tags => {
+                setSelectedTags(tags.map(tag => {
+                    return {label: tag.label, id: tag.value}
+                }))
+            }} isMulti />
             </Form.Group>
           </Col>
         </Row>
 
         <Form.Group controlId="markdown">
           <Form.Label>Body</Form.Label>
-          <Form.Control ref={markdownRef} required as="textarea" rows={15} />
+          <Form.Control required as="textarea" ref={markdownRef} rows={15} />
         </Form.Group>
 
         <Stack direction="horizontal" gap={2} className="justify-content-end">
@@ -63,3 +65,4 @@ export default function NewNote({ onSubmit }: NoteFormProps) {
     </Form>
   )
 }
+  export default NoteForm;
